@@ -34,5 +34,7 @@ public abstract class BaseEntity<U> {
     @Column(name = "updated_by")
     protected U updatedBy;
 
-    private boolean isDeleted;
+    private boolean isDeleted = false;
+
+    private String username;
 }

@@ -9,7 +9,6 @@ import com.linkbharat.linkbharatbackend.domain.model.RegisterRequest;
 import com.linkbharat.linkbharatbackend.repository.AuthUserRepository;
 import com.linkbharat.linkbharatbackend.security.JwtTokenProvider;
 import com.linkbharat.linkbharatbackend.service.AuthService;
-import com.linkbharat.linkbharatbackend.service.RefreshTokenService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,18 +28,18 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenServiceImpl refreshTokenServiceImpl;
 
     public AuthServiceImpl(AuthUserRepository authUserRepository,
                            PasswordEncoder passwordEncoder,
                            JwtTokenProvider jwtTokenProvider,
                            AuthenticationManager authenticationManager,
-                           RefreshTokenService refreshTokenService) {
+                           RefreshTokenServiceImpl refreshTokenServiceImpl) {
         this.authUserRepository = authUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
-        this.refreshTokenService = refreshTokenService;
+        this.refreshTokenServiceImpl = refreshTokenServiceImpl;
     }
 
     @Override
@@ -61,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Generate tokens
         String token = jwtTokenProvider.generateToken(savedAuthUser);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedAuthUser);
+        RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(savedAuthUser);
 
         return new AuthResponse(
                 savedAuthUser.getId(),
@@ -99,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 6️⃣ Generate JWT Token and Refresh Token
             String token = jwtTokenProvider.generateToken(authUser);
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(authUser);
+            RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(authUser);
 
             // 7️⃣ Build and return response
             return new AuthResponse(
@@ -130,14 +129,14 @@ public class AuthServiceImpl implements AuthService {
         String requestRefreshToken = refreshTokenRequest.getRefreshToken();
 
         // Verify the refresh token
-        Optional<RefreshToken> refreshTokenOpt = refreshTokenService.findByToken(requestRefreshToken);
+        Optional<RefreshToken> refreshTokenOpt = refreshTokenServiceImpl.findByToken(requestRefreshToken);
 
         if (refreshTokenOpt.isEmpty()) {
             throw new RuntimeException("Refresh token is not in database!");
         }
 
         RefreshToken refreshToken = refreshTokenOpt.get();
-        refreshTokenService.verifyExpiration(refreshToken);
+        refreshTokenServiceImpl.verifyExpiration(refreshToken);
 
         AuthUser authUser = refreshToken.getAuthUser();
 
@@ -145,7 +144,7 @@ public class AuthServiceImpl implements AuthService {
         String newAccessToken = jwtTokenProvider.generateToken(authUser);
 
         // Optionally generate new refresh token (rotate refresh tokens)
-        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(authUser);
+        RefreshToken newRefreshToken = refreshTokenServiceImpl.createRefreshToken(authUser);
 
         return new AuthResponse(
                 authUser.getId(),
@@ -161,12 +160,12 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void logout(String refreshToken) {
         // Find the refresh token
-        Optional<RefreshToken> tokenOpt = refreshTokenService.findByToken(refreshToken);
+        Optional<RefreshToken> tokenOpt = refreshTokenServiceImpl.findByToken(refreshToken);
 
         // If token exists, delete it using the repository directly
         tokenOpt.ifPresent(token -> {
             // Use the repository to delete the token
-            refreshTokenService.deleteByToken(token);
+            refreshTokenServiceImpl.deleteByToken(token);
         });
     }
 
