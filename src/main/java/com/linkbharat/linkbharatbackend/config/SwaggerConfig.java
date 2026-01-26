@@ -9,14 +9,22 @@ import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.info.Info;
 
 @Configuration
-@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
 public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        return new OpenAPI().components(new Components())
-                .info(new Info().title("Auxentios Technology | Product Configurator Service")
-                        .description("This document used to provide apis details for Product Configurator service"));
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Link Bharat API")
+                        .description("Authentication and User Services"))
+                // THIS PART IS MISSING: It links the SecurityScheme to your APIs
+                .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement()
+                        .addList("bearerAuth"));
     }
-
 }

@@ -1,11 +1,9 @@
 package com.linkbharat.linkbharatbackend.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
@@ -23,4 +21,5 @@ public class RegisterRequest {
 
     @NotBlank
     private String confirmPassword;
+
 }

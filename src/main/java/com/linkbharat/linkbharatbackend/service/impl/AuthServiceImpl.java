@@ -76,10 +76,10 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest request) {
         try {
             // 1️⃣ Validate input
-            if ((request.getEmail() == null || request.getEmail().isBlank()) &&
-                    (request.getUsername() == null || request.getUsername().isBlank())) {
-                throw new IllegalArgumentException("Email or Username must be provided");
-            }
+//            if ((request.getEmail() == null || request.getEmail().isBlank()) &&
+//                    (request.getUsername() == null || request.getUsername().isBlank())) {
+//                throw new IllegalArgumentException("Email or Username must be provided");
+//            }
 
             // 2️⃣ Determine identifier (prefer email)
             String identifier = (request.getEmail() != null && !request.getEmail().isBlank()) ? request.getEmail() : request.getUsername();
@@ -125,25 +125,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
         String requestRefreshToken = refreshTokenRequest.getRefreshToken();
 
-        // Verify the refresh token
-        Optional<RefreshToken> refreshTokenOpt = refreshTokenServiceImpl.findByToken(requestRefreshToken);
+        RefreshToken oldToken = refreshTokenServiceImpl.findActiveByToken(requestRefreshToken)
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
-        if (refreshTokenOpt.isEmpty()) {
-            throw new RuntimeException("Refresh token is not in database!");
-        }
+        refreshTokenServiceImpl.verifyExpiration(oldToken);
 
-        RefreshToken refreshToken = refreshTokenOpt.get();
-        refreshTokenServiceImpl.verifyExpiration(refreshToken);
+        AuthUser authUser = oldToken.getAuthUser();
 
-        AuthUser authUser = refreshToken.getAuthUser();
+        refreshTokenServiceImpl.deleteByToken(oldToken);
 
-        // Generate new access token
         String newAccessToken = jwtTokenProvider.generateToken(authUser);
-
-        // Optionally generate new refresh token (rotate refresh tokens)
         RefreshToken newRefreshToken = refreshTokenServiceImpl.createRefreshToken(authUser);
 
         return new AuthResponse(
@@ -155,6 +150,7 @@ public class AuthServiceImpl implements AuthService {
                 newRefreshToken.getToken()
         );
     }
+
 
     @Override
     @Transactional
@@ -168,15 +164,21 @@ public class AuthServiceImpl implements AuthService {
             refreshTokenServiceImpl.deleteByToken(token);
         });
     }
-
-    public AuthResponse getCurrentUser(String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
+    public AuthResponse getCurrentUser(String bearerToken) {
+        // 1. Robustly extract the token
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
         }
 
+        String token = bearerToken.substring(7).trim();
+
+        // 2. Validate and extract
         if (jwtTokenProvider.validateToken(token)) {
             String username = jwtTokenProvider.getUsernameFromToken(token);
+
+            // Use the same lookup logic as login
             AuthUser authUser = authUserRepository.findByUsername(username)
+                    .or(() -> authUserRepository.findByEmail(username))
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             return new AuthResponse(
@@ -185,9 +187,9 @@ public class AuthServiceImpl implements AuthService {
                     authUser.getEmail(),
                     token,
                     authUser.getRole().name(),
-                    null
+                    null // Refresh token usually not needed for /me
             );
         }
-        throw new RuntimeException("Invalid token");
+        throw new RuntimeException("Token validation failed");
     }
 }

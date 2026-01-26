@@ -3,15 +3,14 @@ package com.linkbharat.linkbharatbackend.domain.entity;
 import com.linkbharat.linkbharatbackend.audit.BaseEntity;
 import com.linkbharat.linkbharatbackend.domain.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 @Entity
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthUser extends BaseEntity<String> {
@@ -35,5 +34,7 @@ public class AuthUser extends BaseEntity<String> {
     private Role role = Role.USER;
 
     private boolean enabled = true;
+
+
 
 }
