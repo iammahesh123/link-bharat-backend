@@ -8,7 +8,6 @@ import lombok.*;
 @Entity
 @Table(name = "notifications")
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Notification extends BaseEntity<String> {
