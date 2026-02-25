@@ -35,6 +35,4 @@ public class AuthUser extends BaseEntity<String> {
 
     private boolean enabled = true;
 
-
-
 }
