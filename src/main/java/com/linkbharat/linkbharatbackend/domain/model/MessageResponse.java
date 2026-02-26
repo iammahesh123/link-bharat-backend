@@ -1,5 +1,6 @@
 package com.linkbharat.linkbharatbackend.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class MessageResponse {
     private Long conversationId;
     private UserSummaryResponse sender;
     private String content;
+    @JsonProperty("isRead")
     private boolean isRead;
     private LocalDateTime createdAt;
 }

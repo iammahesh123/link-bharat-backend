@@ -19,12 +19,10 @@ public class Conversation extends BaseEntity<String> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long conversationId;
 
-    // Sender who initiates the conversation
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_one_id", nullable = false)
     private AuthUser userOne;
 
-    // The other participant
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_two_id", nullable = false)
     private AuthUser userTwo;

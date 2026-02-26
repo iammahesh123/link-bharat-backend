@@ -14,4 +14,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
 
     /** Find a profile by the linked AuthUser's username */
     Optional<UserProfile> findByAuthUser_Username(String username);
+
+    /** Find a profile by the linked AuthUser's email */
+    Optional<UserProfile> findByAuthUser_Email(String email);
 }

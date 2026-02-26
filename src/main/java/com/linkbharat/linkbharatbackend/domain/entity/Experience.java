@@ -18,10 +18,12 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Experience extends BaseEntity<String> {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long experienceId;
     private String title;
+
     @Enumerated(EnumType.STRING)
     private EmploymentType employmentType;
     private String companyName;
@@ -30,6 +32,7 @@ public class Experience extends BaseEntity<String> {
     private String location;
     private String locationType;
     private String description;
+
     @ElementCollection
     private Set<String> top5Skills = new HashSet<>();
     private String mediaUrl;

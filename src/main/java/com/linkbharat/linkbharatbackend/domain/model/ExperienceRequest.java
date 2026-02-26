@@ -30,4 +30,5 @@ public class ExperienceRequest {
     private Set<String> top5Skills = new HashSet<>();
     private String mediaUrl;
     private boolean isCurrentJob;
+    private Long userProfileId;
 }

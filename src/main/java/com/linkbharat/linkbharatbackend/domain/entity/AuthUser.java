@@ -9,11 +9,10 @@ import lombok.*;
 
 @Entity
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthUser extends BaseEntity<String> {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,5 +33,4 @@ public class AuthUser extends BaseEntity<String> {
     private Role role = Role.USER;
 
     private boolean enabled = true;
-
 }

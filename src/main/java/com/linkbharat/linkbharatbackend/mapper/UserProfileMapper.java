@@ -28,6 +28,7 @@ public class UserProfileMapper {
         response.setSkills(userProfile.getSkills());
         response.setConnected(userProfile.isConnected());
         response.setPending(userProfile.isPending());
+        response.setOnboardingComplete(userProfile.isOnboardingComplete());
 
         // Set the AuthUser ID so frontend can build profile URLs (/profile/{id})
         if (userProfile.getAuthUser() != null) {

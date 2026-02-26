@@ -24,4 +24,5 @@ public class UserProfileResponse {
     private boolean isPending;
     private List<ExperienceResponse> experiences = new ArrayList<>();
     private List<EducationResponse> educations = new ArrayList<>();
+    private boolean isOnboardingComplete;
 }
