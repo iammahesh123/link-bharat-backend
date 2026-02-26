@@ -101,4 +101,15 @@ public class UserProfileRequest {
     public void setPending(boolean pending) {
         isPending = pending;
     }
+
+    // ── Onboarding ──────────────────────────────────────────────────────────
+    private Boolean isOnboardingComplete;
+
+    public Boolean getIsOnboardingComplete() {
+        return isOnboardingComplete;
+    }
+
+    public void setIsOnboardingComplete(Boolean isOnboardingComplete) {
+        this.isOnboardingComplete = isOnboardingComplete;
+    }
 }

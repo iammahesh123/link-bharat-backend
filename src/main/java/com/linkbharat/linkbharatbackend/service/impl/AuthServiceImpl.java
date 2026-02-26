@@ -2,11 +2,13 @@ package com.linkbharat.linkbharatbackend.service.impl;
 
 import com.linkbharat.linkbharatbackend.domain.entity.AuthUser;
 import com.linkbharat.linkbharatbackend.domain.entity.RefreshToken;
+import com.linkbharat.linkbharatbackend.domain.entity.UserProfile;
 import com.linkbharat.linkbharatbackend.domain.model.AuthResponse;
 import com.linkbharat.linkbharatbackend.domain.model.LoginRequest;
 import com.linkbharat.linkbharatbackend.domain.model.RefreshTokenRequest;
 import com.linkbharat.linkbharatbackend.domain.model.RegisterRequest;
 import com.linkbharat.linkbharatbackend.repository.AuthUserRepository;
+import com.linkbharat.linkbharatbackend.repository.UserProfileRepository;
 import com.linkbharat.linkbharatbackend.security.JwtTokenProvider;
 import com.linkbharat.linkbharatbackend.service.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,21 +31,25 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
+    private final UserProfileRepository userProfileRepository;
 
     public AuthServiceImpl(AuthUserRepository authUserRepository,
                            PasswordEncoder passwordEncoder,
                            JwtTokenProvider jwtTokenProvider,
                            AuthenticationManager authenticationManager,
-                           RefreshTokenServiceImpl refreshTokenServiceImpl) {
+                           RefreshTokenServiceImpl refreshTokenServiceImpl, UserProfileRepository userProfileRepository) {
         this.authUserRepository = authUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.refreshTokenServiceImpl = refreshTokenServiceImpl;
+        this.userProfileRepository = userProfileRepository;
     }
 
     @Override
+    @Transactional
     public AuthResponse register(RegisterRequest registerRequest) {
+
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
             throw new RuntimeException("Passwords do not match");
         }
@@ -51,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
         if (authUserRepository.existsByEmail(registerRequest.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
+
         AuthUser authUser = new AuthUser();
         authUser.setEmail(registerRequest.getEmail());
         authUser.setUsername(registerRequest.getUsername());
@@ -58,7 +65,16 @@ public class AuthServiceImpl implements AuthService {
 
         AuthUser savedAuthUser = authUserRepository.save(authUser);
 
-        // Generate tokens
+        UserProfile profile = new UserProfile();
+        profile.setAuthUser(savedAuthUser);
+        profile.setName(savedAuthUser.getUsername());
+        profile.setHeadLine("New to LinkBharat 🚀");
+        profile.setConnections(0);
+        profile.setConnected(false);
+        profile.setPending(false);
+
+        userProfileRepository.save(profile);
+
         String token = jwtTokenProvider.generateToken(savedAuthUser);
         RefreshToken refreshToken = refreshTokenServiceImpl.createRefreshToken(savedAuthUser);
 

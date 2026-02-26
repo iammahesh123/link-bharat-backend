@@ -116,6 +116,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (request.getLocation() != null) userProfile.setLocation(request.getLocation());
         if (request.getAbout() != null) userProfile.setAbout(request.getAbout());
         if (request.getSkills() != null) userProfile.setSkills(request.getSkills());
+        if (request.getIsOnboardingComplete() != null) userProfile.setOnboardingComplete(request.getIsOnboardingComplete());
 
         UserProfile saved = userProfileRepository.save(userProfile);
         return userProfileMapper.toDTO(saved, modelMapper);

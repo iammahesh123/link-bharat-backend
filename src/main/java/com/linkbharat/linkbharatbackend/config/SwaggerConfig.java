@@ -23,7 +23,6 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("Link Bharat API")
                         .description("Authentication and User Services"))
-                // THIS PART IS MISSING: It links the SecurityScheme to your APIs
                 .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement()
                         .addList("bearerAuth"));
     }
