@@ -44,7 +44,5 @@ public class UserProfile extends BaseEntity<String> {
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Experience> experiences = new HashSet<>();
 
-    // ── Onboarding ───────────────────────────────────────────────────────────
-    /** False until the user completes (or skips) the first-time onboarding wizard. */
     private boolean isOnboardingComplete = false;
 }

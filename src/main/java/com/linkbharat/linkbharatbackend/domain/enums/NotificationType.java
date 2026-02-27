@@ -7,5 +7,7 @@ public enum NotificationType {
     CONNECTION_ACCEPTED,
     MESSAGE,
     JOB,
-    SHARE
+    SHARE,
+    JOB_APPLICATION,
+    APPLICATION_STATUS_CHANGE
 }

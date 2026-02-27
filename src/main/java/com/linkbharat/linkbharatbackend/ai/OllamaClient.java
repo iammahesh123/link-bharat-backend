@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@Profile("dev")
+@Profile("local")
 @RequiredArgsConstructor
 public class OllamaClient implements AIModelClient {
 
